@@ -13,25 +13,38 @@ def notifyMe(title, message):
     )
 
 
+def getData(url):
+    r = requests.get(url)
+    return r.text
+
+
 if __name__ == "__main__":
     while True:
-        myHtmlData = requests.get('https://www.mohfw.gov.in/').text
+        # notifyMe("COVID-19", "Lets stop the spread of this virus together")
+        myHtmlData = getData('https://www.worldometers.info/coronavirus/#countries')
 
         soup = BeautifulSoup(myHtmlData, 'html.parser')
         # print(soup.prettify())
+
         myDataStr = ""
         for tr in soup.find_all('tbody')[0].find_all('tr'):
             myDataStr += tr.get_text()
-        myDataStr = myDataStr[1:]
+
         itemList = myDataStr.split("\n\n")
 
-        states = ['Chandigarh', 'Rajasthan', 'Uttar Pradesh']
-        for item in itemList[0:22]:
+        countries = ['USA', 'CHINA', 'INDIA', 'BRAZIL', 'UK', 'RUSSIA']
+        for item in itemList[:]:
             dataList = item.split('\n')
-            # print(dataList)
-            if dataList[1] in states:
-                nTitle = 'Cases of Covid-19'
-                nText = f"State {dataList[1]}\nIndian : {dataList[2]} & Foreign : {dataList[3]}\nCured :  {dataList[4]}\nDeaths :  {dataList[5]}"
-                notifyMe(nTitle, nText)
-                time.sleep(5)
+            if len(dataList) > 2:
+                # print(dataList)
+                if dataList[1].upper() in countries:
+                    nTitle = 'Covid-19 Update'
+                    nText = f"{dataList[1]} has total {dataList[2]} cases"
+                    notifyMe(nTitle, nText)
+                    time.sleep(10)
+                elif dataList[2].upper() in countries:
+                    nTitle = 'Covid-19 Update'
+                    nText = f"{dataList[2]} has total {dataList[3]} cases"
+                    notifyMe(nTitle, nText)
+                    time.sleep(10)
         time.sleep(3600)
